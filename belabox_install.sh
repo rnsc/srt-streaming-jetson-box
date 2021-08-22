@@ -24,8 +24,11 @@ sudo chmod 755 /etc/NetworkManager/dispatcher.d/nm-source-routing
 printf "120 wlan0\n121 wlan1\n122 wlan2\n123 wlan3\n124 wlan4\n" | sudo tee -a /etc/iproute2/rt_tables
 
 # Disabling nv-l4t-usb-device-mode
-systemctl stop nv-l4t-usb-device-mode.service
-sudo systemctl disable nv-l4t-usb-device-mode.service
+if systemctl list-units --type=service | grep -q nv-l4t-usb ;
+then
+  systemctl stop nv-l4t-usb-device-mode.service
+  sudo systemctl disable nv-l4t-usb-device-mode.service
+fi
 
 # SRT setup
 cd "$HOME" || exit
