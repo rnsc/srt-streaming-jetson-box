@@ -10,6 +10,7 @@ sudo apt-get dist-upgrade -y
 sudo apt-get -y install cmake nano build-essential git tcl libssl-dev ruby ruby-sinatra ruby-sinatra-contrib usb-modeswitch libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 
 # Set google DNS as primary DNS servers
+sudo mkdir -p /etc/resolvconf/resolv.conf.d/
 printf "\nnameserver 8.8.8.8\nnameserver 8.8.4.4\n" | sudo tee -a /etc/resolvconf/resolv.conf.d/head
 
 # Download and setup dhclient and routing
