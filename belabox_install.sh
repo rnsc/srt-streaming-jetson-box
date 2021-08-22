@@ -59,7 +59,7 @@ cd belaUI || exit
 sed -i "/\/home\/nvidia/$(pwd)/g" setup.json
 
 while true; do
-	read -r -p "Do you want to autostart streaming with belaUI?" yn
+	read -r -p "Do you want to autostart streaming with belaUI? " yn
 	case $yn in
 		[Yy]* ) sed -i "/\"autostart\": false/\"autostart\": true/g" setup.json; break;;
 		[Nn]* ) break;;
@@ -68,7 +68,7 @@ while true; do
 done
 
 while true; do
-	read -r -p "Do you want to install belaUI as a service?" yn
+	read -r -p "Do you want to install belaUI as a service? " yn
 	case $yn in
 		[Yy]* ) sudo ./install_service.sh; break;;
 		[Nn]* ) break;;
