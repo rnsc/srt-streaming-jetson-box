@@ -56,7 +56,7 @@ cd "$HOME" || exit
 git clone https://github.com/rnsc/belaUI.git
 cd belaUI || exit
 
-sed -i "s#/home/nvidia#$(pwd)#g" setup.json
+sed -i "s#/home/nvidia#${HOME}#g" setup.json
 
 while true; do
 	read -r -p "Do you want to autostart streaming with belaUI? " yn
