@@ -5,9 +5,9 @@ set +ex
 # System packages
 sudo apt-get update
 
-sudo apt-get dist-upgrade
+sudo apt-get dist-upgrade -y
 
-sudo apt-get install cmake nano build-essential git tcl libssl-dev ruby ruby-sinatra ruby-sinatra-contrib usb-modeswitch libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
+sudo apt-get -y install cmake nano build-essential git tcl libssl-dev ruby ruby-sinatra ruby-sinatra-contrib usb-modeswitch libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev
 
 # Set google DNS as primary DNS servers
 printf "\nnameserver 8.8.8.8\nnameserver 8.8.4.4\n" | sudo tee -a /etc/resolvconf/resolv.conf.d/head
@@ -77,3 +77,5 @@ printf "You'll have to provide:\n"
 printf "\t* the IP of your SRT receiver/server.\n"
 printf "\t* the port of your SRT receiver/server. (most likely 5000 if you haven't changed the default of the moo-the-cow Docker setup)\n"
 printf "Go to http://localhost/ in Firefox and happy configuring!\n"
+
+cd "$HOME" || exit
