@@ -56,12 +56,12 @@ cd "$HOME" || exit
 git clone https://github.com/rnsc/belaUI.git
 cd belaUI || exit
 
-sed -i "/\/home\/nvidia/$(pwd)/g" setup.json
+sed -i "s/\/home\/nvidia/$(pwd)/g" setup.json
 
 while true; do
 	read -r -p "Do you want to autostart streaming with belaUI? " yn
 	case $yn in
-		[Yy]* ) sed -i "/\"autostart\": false/\"autostart\": true/g" setup.json; break;;
+		[Yy]* ) sed -i "s/\"autostart\": false/\"autostart\": true/g" setup.json; break;;
 		[Nn]* ) break;;
 		* ) echo "Please answer yes or no.";;
 	esac
