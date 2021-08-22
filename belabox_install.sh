@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 # System packages
 sudo apt-get update
