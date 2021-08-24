@@ -124,7 +124,7 @@
         dest: "{{ user_dir }}/belaUI/.gitignore"
 
     - name: "cmd | change default home in belaUI config"
-      ansible.builtin.cmd:
+      ansible.builtin.command:
         sed -i "s#/home/nvidia#{{ user_dir }}#g" "{{ user_dir }}"/belaUI/setup.json
 
     - name: "lineinfile | autostart in belaUI config"
@@ -142,7 +142,7 @@
 
     - name: "cmd | configure make srt"
       become: true
-      shell:
+      ansible.builtin.shell:
         ./configure --prefix=/usr/local
         make -j4
         sudo make install
@@ -152,7 +152,7 @@
         creates: /usr/local/lib/libsrt.so
 
     - name: "cmd | make {{ item }}"
-      shell:
+      ansible.builtin.shell:
         make
       loop:
         - name: belacoder
