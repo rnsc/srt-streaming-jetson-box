@@ -1,0 +1,162 @@
+---
+
+- hosts: localhost
+  vars:
+    apt_packages:
+      - cmake
+      - nano
+      - build-essential
+      - git
+      - tcl
+      - libssl-dev
+      - ruby
+      - ruby-sinatra
+      - ruby-sinatra-contrib
+      - usb-modeswitch
+      - libgstreamer1.0-dev
+      - libgstreamer-plugins-base1.0-dev
+    resolvconf_dir: "/etc/resolvconf/resolv.conf.d/"
+  tasks:
+    - name: "set_fact | user_dir"
+      ansible.builtin.set_fact:
+        set_fact:
+          user_dir: "{{ ansible_user_dir }}"
+
+    - name: "apt | OS update"
+      become: true
+      ansible.builtin.apt:
+        upgrade: dist
+
+    - name: "apt | install packages"
+      become: true
+      ansible.builtin.apt:
+        name: "{{ apt_packages }}"
+        state: present
+
+    - name: "file | create resolv.conf.d head file"
+      become: true
+      ansible.builtin.file:
+        path: "{{ resolvconf_dir }}"
+        state: directory
+
+    - name: "lineinfile | google DNS servers as default for resolvconf"
+      become: true
+      ansible.builtin.lineinfile:
+        line: "{{ nameserver }}"
+        path: "{{ resolvconf_dir }}/head"
+        create: true
+      loop:
+        - nameserver 8.8.8.8
+        - nameserver 8.8.4.4
+      loop_control:
+        loop_var: nameserver
+
+    - name: "copy | network configuration files"
+      become: true
+      ansible.builtin.copy:
+        src: "{{ file.src }}"
+        dest: "{{ file.dest }}"
+      loop:
+        - src: interfaces
+          dest: /etc/network/interfaces
+        - src: dhclient-source-routing
+          dest: /etc/dhcp/dhclient-exit-hooks.d/dhclient-source-routing
+      loop_control:
+        loop_var: file
+
+    - name: "copy | NetworkManager config"
+      become: true
+      ansible.builtin.copy:
+        src: nm-source-routing
+        dest: /etc/NetworkManager/dispatcher.d/nm-source-routing
+        mode: 0755
+
+    - name: "lineinfile | google DNS servers as default for resolvconf"
+      become: true
+      ansible.builtin.lineinfile:
+        line: "{{ rt }}"
+        path: "/etc/iproute2/rt_tables"
+        create: true
+      loop:
+        - 100 usb0
+        - 101 usb1
+        - 102 usb2
+        - 103 usb3
+        - 104 usb4
+        - 110 eth0
+        - 111 eth1
+        - 112 eth2
+        - 113 eth3
+        - 114 eth4
+        - 120 wlan0
+        - 121 wlan1
+        - 122 wlan2
+        - 123 wlan3
+        - 124 wlan4
+      loop_control:
+        loop_var: rt
+
+    - name: "systemd | disable nv-l4t-usb-device-mode"
+      become: true
+      ansible.builtin.systemd:
+        name: nv-l4t-usb-device-mode
+        state: stopped
+        enabled: false
+
+    - name: "git | clone necessary repos"
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ user_dir }}/{{ repo_name }}"
+      loop:
+        - repo_url: https://github.com/BELABOX/srt.git
+          repo_name: srt
+        - repo_url: https://github.com/BELABOX/belacoder.git
+          repo_name: belacoder
+        - repo_url: https://github.com/BELABOX/srtla.git
+          repo_name: srtla
+        - repo_url: https://github.com/rnsc/belaUI.git
+          repo_name: belaUI
+
+    - name: "copy | add gitignore for belaUI json files"
+      ansible.builtin.copy:
+        content: |
+          *.json
+        dest: "{{ user_dir }}/belaUI/.gitignore"
+
+    - name: "cmd | change default home in belaUI config"
+      ansible.builtin.cmd:
+        sed -i "s#/home/nvidia#{{ user_dir }}#g" "{{ user_dir }}"/belaUI/setup.json
+
+    - name: "cmd | autostart in belaUI config"
+      ansible.builtin.cmd:
+        sed -i 's#\"autostart\"\: false#\"autostart\"\: true#g' "{{ user_dir }}"/belaUI/setup.json
+
+    - name: "copy | copy belaUI service file"
+      become: true
+      ansible.builtin.copy:
+        src: "{{ user_dir }}/belaUI/belaUI.service"
+        dest: /etc/systemd/system/belaUI.service
+      notify: enable and start belaUI
+
+    - name: "cmd | configure make srt"
+      become: true
+      shell:
+        ./configure --prefix=/usr/local
+        make -j4
+        sudo make install
+        sudo ldconfig
+      args:
+        chdir: "{{ user_dir }}/srt"
+        creates: /usr/local/lib/libsrt.so
+
+    - name: "cmd | make {{ item }}"
+      shell:
+        make
+      loop:
+        - name: belacoder
+          creates: belacoder
+        - name: srtla
+          creates: srtla_rec
+      args:
+        chdir: "{{ user_dir }}/{{ item.name }}"
+        creates: "{{ item.creates }}"
