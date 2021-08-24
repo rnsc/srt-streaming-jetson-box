@@ -1,6 +1,6 @@
 ---
 
-- name: "enable and start belaUI"
+- name: enable and start belaUI
   ansible.builtin.systemd:
     name: belaUI
     daemon_reload: true
