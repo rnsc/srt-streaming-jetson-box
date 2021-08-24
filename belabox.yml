@@ -71,7 +71,7 @@
         dest: /etc/NetworkManager/dispatcher.d/nm-source-routing
         mode: 0755
 
-    - name: "lineinfile | google DNS servers as default for resolvconf"
+    - name: "lineinfile | route tables config"
       become: true
       ansible.builtin.lineinfile:
         line: "{{ rt }}"
@@ -102,6 +102,7 @@
         name: nv-l4t-usb-device-mode
         state: stopped
         enabled: false
+      failed_when: false
 
     - name: "git | clone necessary repos"
       ansible.builtin.git:
