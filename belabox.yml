@@ -122,6 +122,7 @@
       failed_when: false
 
     - name: "cmd | change default home in belaUI config"
+      changed_when: false
       ansible.builtin.command:
         sed -i "s#/home/nvidia#{{ user_dir }}#g" "{{ user_dir }}"/belaUI/setup.json
 
@@ -130,11 +131,12 @@
         path: "{{ user_dir }}/belaUI/setup.json"
         regexp: "\"autostart\".+"
         line: "  \"autostart\": true,"
+      notify: enable and start belaUI
 
     - name: "copy | copy belaUI service file"
       become: true
-      ansible.builtin.copy:
-        src: "{{ user_dir }}/belaUI/belaUI.service"
+      ansible.builtin.template:
+        src: "belaUI.service.j2"
         dest: /etc/systemd/system/belaUI.service
       notify: enable and start belaUI
 
