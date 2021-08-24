@@ -114,14 +114,12 @@
           repo_name: belacoder
         - repo_url: https://github.com/BELABOX/srtla.git
           repo_name: srtla
-        - repo_url: https://github.com/rnsc/belaUI.git
-          repo_name: belaUI
-
-    - name: "copy | add gitignore for belaUI json files"
-      ansible.builtin.copy:
-        content: |
-          *.json
-        dest: "{{ user_dir }}/belaUI/.gitignore"
+    
+    - name: "git | clone belaUI repo"
+      ansible.builtin.git:
+        repo: https://github.com/rnsc/belaUI.git
+        dest: "{{ user_dir }}/belaUI"
+      failed_when: false
 
     - name: "cmd | change default home in belaUI config"
       ansible.builtin.command:
