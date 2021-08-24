@@ -16,6 +16,14 @@
       - libgstreamer1.0-dev
       - libgstreamer-plugins-base1.0-dev
     resolvconf_dir: "/etc/resolvconf/resolv.conf.d/"
+  handlers:
+    - name: enable and start belaUI
+      become: true
+      ansible.builtin.systemd:
+        name: belaUI
+        daemon_reload: true
+        enabled: true
+        state: started
   tasks:
     - name: "set_fact | user_dir"
       ansible.builtin.set_fact:

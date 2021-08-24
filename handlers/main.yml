@@ -1,9 +1,0 @@
----
-
-- name: enable and start belaUI
-  become: true
-  ansible.builtin.systemd:
-    name: belaUI
-    daemon_reload: true
-    enabled: true
-    state: started
