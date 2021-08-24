@@ -129,7 +129,7 @@
 
     - name: "lineinfile | autostart in belaUI config"
       ansible.builtin.lineinfile:
-        path: "{{ user_dir }}"/belaUI/setup.json
+        path: "{{ user_dir }}/belaUI/setup.json"
         regexp: "\"autostart\".+"
         line: "\"autostart\": true,"
 
