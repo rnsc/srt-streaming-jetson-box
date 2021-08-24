@@ -104,6 +104,7 @@
       failed_when: false
 
     - name: "git | clone necessary repos"
+      failed_when: false
       ansible.builtin.git:
         repo: "{{ item.repo_url }}"
         dest: "{{ user_dir }}/{{ item.repo_name }}"
