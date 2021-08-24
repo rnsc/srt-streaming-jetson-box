@@ -162,3 +162,9 @@
       args:
         chdir: "{{ user_dir }}/{{ item.name }}"
         creates: "{{ item.creates }}"
+
+    - name: "systemd | enable and start belaUI"
+      ansible.builtin.systemd:
+        name: belaUI
+        enabled: true
+        state: started
