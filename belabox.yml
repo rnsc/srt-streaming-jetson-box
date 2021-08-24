@@ -19,8 +19,7 @@
   tasks:
     - name: "set_fact | user_dir"
       ansible.builtin.set_fact:
-        set_fact:
-          user_dir: "{{ ansible_user_dir }}"
+        user_dir: "{{ ansible_user_dir }}"
 
     - name: "apt | OS update"
       become: true
