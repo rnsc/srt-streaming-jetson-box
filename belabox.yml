@@ -106,8 +106,8 @@
 
     - name: "git | clone necessary repos"
       ansible.builtin.git:
-        repo: "{{ repo_url }}"
-        dest: "{{ user_dir }}/{{ repo_name }}"
+        repo: "{{ item.repo_url }}"
+        dest: "{{ user_dir }}/{{ item.repo_name }}"
       loop:
         - repo_url: https://github.com/BELABOX/srt.git
           repo_name: srt
