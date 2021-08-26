@@ -209,7 +209,7 @@
         dest: /etc/systemd/system/automagic-fan.service
       notify: restart automagic-fan
 
-    - name: "systemd | enable and start belaUI"
+    - name: "systemd | enable and start automagic-fan"
       become: true
       ansible.builtin.systemd:
         name: automagic-fan
