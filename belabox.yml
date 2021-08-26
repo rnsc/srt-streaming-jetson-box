@@ -181,11 +181,13 @@
         chdir: "{{ user_dir }}/{{ item.name }}"
         creates: "{{ item.creates }}"
 
-    - name: "pip | install jetsonfanctl"
+    - name: "pip | install jetsonfanctl (automagic-fan)"
       become: true
       ansible.builtin.pip:
         name: https://github.com/rnsc/jetson-fan-ctl/releases/download/v0.1.0/jetsonfanctl-0.1.0-py3-none-any.whl
         executable: pip3
+      tags:
+        - jetsonfanctl
 
     - name: "file | create automagic-fan etc dir"
       become: true
@@ -193,14 +195,18 @@
         path: /etc/automagic-fan
         mode: 0644
         state: directory
+      tags:
+        - jetsonfanctl
 
-    - name: "copy | copy config for jetsonfanctl"
+    - name: "copy | copy config for automagic-fan"
       become: true
       ansible.builtin.copy:
         src: jetsonfanctl/config.json
         dest: /etc/automagic-fan/config.json
         mode: 0644
       notify: restart automagic-fan
+      tags:
+        - jetsonfanctl
 
     - name: "copy | automagic-fan systemd unit"
       become: true
@@ -208,6 +214,8 @@
         src: jetsonfanctl/automagic-fan.service
         dest: /etc/systemd/system/automagic-fan.service
       notify: restart automagic-fan
+      tags:
+        - jetsonfanctl
 
     - name: "systemd | enable and start automagic-fan"
       become: true
@@ -215,6 +223,8 @@
         name: automagic-fan
         enabled: true
         state: started
+      tags:
+        - jetsonfanctl
 
     - name: "systemd | enable and start belaUI"
       become: true
