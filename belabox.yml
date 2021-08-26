@@ -15,15 +15,24 @@
       - usb-modeswitch
       - libgstreamer1.0-dev
       - libgstreamer-plugins-base1.0-dev
+      - python3-pip
+      - python3-setuptools
     resolvconf_dir: "/etc/resolvconf/resolv.conf.d/"
   handlers:
-    - name: enable and start belaUI
+    - name: restart belaUI
       become: true
       ansible.builtin.systemd:
         name: belaUI
         daemon_reload: true
         enabled: true
-        state: started
+        state: restarted
+    - name: restart automagic-fan
+      become: true
+      ansible.builtin.systemd:
+        name: automagic-fan
+        daemon_reload: true
+        enabled: true
+        state: restarted
   tasks:
     - name: "set_fact | user_dir"
       ansible.builtin.set_fact:
@@ -64,9 +73,9 @@
         src: "{{ file.src }}"
         dest: "{{ file.dest }}"
       loop:
-        - src: interfaces
+        - src: belabox/interfaces
           dest: /etc/network/interfaces
-        - src: dhclient-source-routing
+        - src: belabox/dhclient-source-routing
           dest: /etc/dhcp/dhclient-exit-hooks.d/dhclient-source-routing
       loop_control:
         loop_var: file
@@ -74,7 +83,7 @@
     - name: "copy | NetworkManager config"
       become: true
       ansible.builtin.copy:
-        src: nm-source-routing
+        src: belabox/nm-source-routing
         dest: /etc/NetworkManager/dispatcher.d/nm-source-routing
         mode: 0755
 
@@ -140,14 +149,14 @@
         path: "{{ user_dir }}/belaUI/setup.json"
         regexp: "\"autostart\".+"
         line: "  \"autostart\": true,"
-      notify: enable and start belaUI
+      notify: restart belaUI
 
     - name: "copy | copy belaUI service file"
       become: true
       ansible.builtin.template:
         src: "belaUI.service.j2"
         dest: /etc/systemd/system/belaUI.service
-      notify: enable and start belaUI
+      notify: restart belaUI
 
     - name: "cmd | configure make srt"
       become: true
@@ -171,6 +180,41 @@
       args:
         chdir: "{{ user_dir }}/{{ item.name }}"
         creates: "{{ item.creates }}"
+
+    - name: "pip | install jetsonfanctl"
+      become: true
+      ansible.builtin.pip:
+        name: https://github.com/rnsc/jetson-fan-ctl/releases/download/v0.1.0/jetsonfanctl-0.1.0-py3-none-any.whl
+        executable: pip3
+
+    - name: "file | create automagic-fan etc dir"
+      become: true
+      file:
+        path: /etc/automagic-fan
+        mode: 0644
+        state: directory
+
+    - name: "copy | copy config for jetsonfanctl"
+      become: true
+      ansible.builtin.copy:
+        src: jetsonfanctl/config.json
+        dest: /etc/automagic-fan/config.json
+        mode: 0644
+      notify: restart automagic-fan
+
+    - name: "copy | automagic-fan systemd unit"
+      become: true
+      ansible.builtin.copy:
+        src: jetsonfanctl/automagic-fan.service
+        dest: /etc/systemd/system/automagic-fan.service
+      notify: restart automagic-fan
+
+    - name: "systemd | enable and start belaUI"
+      become: true
+      ansible.builtin.systemd:
+        name: automagic-fan
+        enabled: true
+        state: started
 
     - name: "systemd | enable and start belaUI"
       become: true
