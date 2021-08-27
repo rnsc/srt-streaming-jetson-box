@@ -1,0 +1,74 @@
+---
+
+- hosts: localhost
+  handlers:
+    - name: restart hostapd
+      systemd:
+        name: hostapd
+        daemon-reload: true
+        enabled: true
+        state: restarted
+    - name: restart dnsmasq
+      systemd:
+        name: dnsmasq
+        daemon-reload: true
+        enabled: true
+        state: restarted
+    - name: start wlan0
+      cmd: ifup wlan0
+  tasks:
+    - name: "assert | that ap_ssid and ap_password are set"
+      ansible.builtin.assert:
+        that:
+          - ap_ssid is defined
+          - ap_password is defined
+
+    - name: "apt | install hostapd and dnsmasq"
+      ansible.builtin.apt:
+        name:
+          - hostapd
+          - dnsmasq
+
+    - name: "copy | hostapd config"
+      ansible.builtin.copy:
+        content: |
+          interface=wlan0
+          driver=iwlwifi
+          hw_mode=g
+          channel=7
+          wmm_enabled=0
+          macaddr_acl=0
+          auth_algs=1
+          ignore_broadcast_ssid=0
+          wpa=2
+          wpa_key_mgmt=WPA-PSK
+          rsn_pairwise=CCMP
+          ssid="{{ ap_ssid }}"
+          wpa_passphrase="{{ ap_password }}"
+        dest: /etc/hostapd/hostapd.conf
+      notify: restart hostapd
+
+    # - name: "copy | dhcpcd.conf"
+    #   ansible.builtin.copy:
+    #     content: |
+    #       interface wlan0
+    #       static ip_address=192.168.10.1/24
+    #       denyinterfaces usb* eth*
+
+    - name: "copy | wlan0 static config"
+      ansible.builtin.copy:
+        content: |
+          allow-hotplug wlan0
+          iface wlan0 inet static
+            address 192.168.10.1
+            netmask 255.255.255.0
+        dest: /etc/network/interfaces.d/wlan0
+      notify: start wlan0
+
+    - name: "copy | dnsmasq config"
+      ansible.builtin.copy:
+        content: |
+          interface=wlan0
+          dhcp-range=192.168.10.2,192.168.10.50,255.255.255.0,24h
+        dest: /etc/dnsmasq.conf
+      notify: restart dnsmasq
