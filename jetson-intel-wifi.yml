@@ -30,6 +30,17 @@
           - hostapd
           - dnsmasq
 
+    - name: "systemd | enable systemd units"
+      ansible.builtin.systemd:
+        name: "{{ unit }}"
+        daemon-reload: true
+        enabled: true
+      loop:
+        - hostapd
+        - dnsmasq
+      loop_control:
+        loop_var: unit
+
     - name: "copy | hostapd config"
       ansible.builtin.copy:
         content: |
