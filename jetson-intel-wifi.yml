@@ -15,7 +15,7 @@
         enabled: true
         state: restarted
     - name: start wlan0
-      cmd: ifup wlan0
+      shell: ifup wlan0
   tasks:
     - name: "assert | that ap_ssid and ap_password are set"
       ansible.builtin.assert:
