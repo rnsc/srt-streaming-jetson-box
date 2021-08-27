@@ -1,6 +1,7 @@
 ---
 
 - hosts: localhost
+  become: true
   handlers:
     - name: restart hostapd
       systemd:
