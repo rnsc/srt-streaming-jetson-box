@@ -49,12 +49,12 @@
         dest: /etc/hostapd/hostapd.conf
       notify: restart hostapd
 
-      - name: "copy | hostapd config link"
-        ansible.builtin.copy:
-          content: |
-            DAEMON_CONF="/etc/hostapd/hostapd.conf"
-          dest: /etc/default/hostapd
-        notify: restart hostapd
+    - name: "copy | hostapd config link"
+      ansible.builtin.copy:
+        content: |
+          DAEMON_CONF="/etc/hostapd/hostapd.conf"
+        dest: /etc/default/hostapd
+      notify: restart hostapd
 
     # - name: "copy | dhcpcd.conf"
     #   ansible.builtin.copy:
