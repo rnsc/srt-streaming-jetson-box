@@ -19,6 +19,9 @@
       - python3-setuptools
     resolvconf_dir: "/etc/resolvconf/resolv.conf.d/"
     enable_jetsonfanctl: false
+    wifi_access_point: false
+    intel_wifi: false
+    template_belaui_config: false
   handlers:
     - name: restart belaUI
       become: true
@@ -27,6 +30,7 @@
         daemon_reload: true
         enabled: true
         state: restarted
+
     - name: restart automagic-fan
       become: true
       ansible.builtin.systemd:
@@ -35,6 +39,13 @@
         enabled: true
         state: restarted
   tasks:
+    - name: "assert | that needed variables are set"
+      ansible.builtin.assert:
+        that:
+          - srtla_addr is defined
+          - resolvconf_dir is defined
+          - enable_jetsonfanctl is defined
+
     - name: "set_fact | user_dir"
       ansible.builtin.set_fact:
         user_dir: "{{ ansible_user_dir }}"
@@ -152,10 +163,10 @@
         line: "  \"autostart\": true,"
       notify: restart belaUI
 
-    - name: "copy | copy belaUI service file"
+    - name: "template | belaUI service file"
       become: true
       ansible.builtin.template:
-        src: "belaUI.service.j2"
+        src: "belaUI/belaUI.service.j2"
         dest: /etc/systemd/system/belaUI.service
       notify: restart belaUI
 
@@ -232,9 +243,28 @@
       tags:
         - jetsonfanctl
 
+    - name: "template | template belaUI config files"
+      ansible.builtin.template:
+        src: "belaUI/{{ file }}.j2"
+        dest: "{{ user_dir }}/belaUI/{{ file }}"
+      notify: restart belaUI
+      loop:
+        - config.json
+        - setup.json
+      loop_control:
+        loop_var: file
+      when:
+        - template_belaui_config | bool
+
     - name: "systemd | enable and start belaUI"
       become: true
       ansible.builtin.systemd:
         name: belaUI
         enabled: true
         state: started
+
+    - name: "include | jetson-intel-wifi.yml"
+      ansible.builtin.include: "jetson-intel-wifi.yml"
+      when:
+        - wifi_access_point | bool
+        - intel_wifi | bool
