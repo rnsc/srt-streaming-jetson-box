@@ -8,6 +8,7 @@
         name: hostapd
         daemon_reload: true
         enabled: true
+        masked: false
         state: restarted
     - name: restart dnsmasq
       systemd:
@@ -86,6 +87,7 @@
         name: "{{ unit }}"
         daemon_reload: true
         enabled: true
+        masked: false
         state: started
       loop:
         - hostapd
