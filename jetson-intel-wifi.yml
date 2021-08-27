@@ -6,13 +6,13 @@
     - name: restart hostapd
       systemd:
         name: hostapd
-        daemon-reload: true
+        daemon_reload: true
         enabled: true
         state: restarted
     - name: restart dnsmasq
       systemd:
         name: dnsmasq
-        daemon-reload: true
+        daemon_reload: true
         enabled: true
         state: restarted
     - name: start wlan0
@@ -29,17 +29,6 @@
         name:
           - hostapd
           - dnsmasq
-
-    - name: "systemd | enable systemd units"
-      ansible.builtin.systemd:
-        name: "{{ unit }}"
-        daemon-reload: true
-        enabled: true
-      loop:
-        - hostapd
-        - dnsmasq
-      loop_control:
-        loop_var: unit
 
     - name: "copy | hostapd config"
       ansible.builtin.copy:
@@ -84,3 +73,15 @@
           dhcp-range=192.168.10.2,192.168.10.50,255.255.255.0,24h
         dest: /etc/dnsmasq.conf
       notify: restart dnsmasq
+
+    - name: "systemd | enable systemd units"
+      ansible.builtin.systemd:
+        name: "{{ unit }}"
+        daemon_reload: true
+        enabled: true
+        state: started
+      loop:
+        - hostapd
+        - dnsmasq
+      loop_control:
+        loop_var: unit
