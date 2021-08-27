@@ -35,7 +35,7 @@
       ansible.builtin.copy:
         content: |
           interface=wlan0
-          driver=iwlwifi
+          driver=nl80211
           hw_mode=g
           channel=7
           wmm_enabled=0
@@ -45,8 +45,8 @@
           wpa=2
           wpa_key_mgmt=WPA-PSK
           rsn_pairwise=CCMP
-          ssid="{{ ap_ssid }}"
-          wpa_passphrase="{{ ap_password }}"
+          ssid={{ ap_ssid }}
+          wpa_passphrase={{ ap_password }}
         dest: /etc/hostapd/hostapd.conf
       notify: restart hostapd
 
