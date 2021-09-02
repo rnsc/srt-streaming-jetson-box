@@ -1,0 +1,57 @@
+---
+
+- hosts: localhost
+  become: true
+  handlers:
+    - name: restart belaboxgpio
+      become: true
+      ansible.builtin.systemd:
+        name: belaboxgpio
+        daemon_reload: true
+        enabled: true
+        state: restarted
+  tasks:
+    - name: "pip | install belaboxgpio"
+      become: true
+      ansible.builtin.pip:
+        name: https://github.com/rnsc/belabox-gpio/releases/download/v0.1.0/belaboxgpio-0.1.0-py3-none-any.whl
+        executable: pip3
+      tags:
+        - belaboxgpio
+
+    - name: "file | create belaboxgpio etc dir"
+      become: true
+      file:
+        path: /etc/belaboxgpio
+        mode: 0644
+        state: directory
+      tags:
+        - belaboxgpio
+
+    - name: "copy | copy config for belaboxgpio"
+      become: true
+      ansible.builtin.copy:
+        src: belaboxgpio/belaboxgpio.json
+        dest: /etc/belaboxgpio/belaboxgpio.json
+        mode: 0644
+      notify: restart belaboxgpio
+      tags:
+        - belaboxgpio
+
+    - name: "copy | belaboxgpio systemd unit"
+      become: true
+      ansible.builtin.copy:
+        src: belaboxgpio/belaboxgpio.service
+        dest: /etc/systemd/system/belaboxgpio.service
+      notify: restart belaboxgpio
+      tags:
+        - belaboxgpio
+
+    - name: "systemd | enable and start belaboxgpio"
+      become: true
+      ansible.builtin.systemd:
+        name: belaboxgpio
+        enabled: true
+        state: started
+      tags:
+        - belaboxgpio

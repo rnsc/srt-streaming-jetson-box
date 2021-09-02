@@ -1,0 +1,57 @@
+---
+
+- hosts: localhost
+  become: true
+  handlers:
+    - name: restart automagic-fan
+      become: true
+      ansible.builtin.systemd:
+        name: automagic-fan
+        daemon_reload: true
+        enabled: true
+        state: restarted
+  tasks:
+    - name: "pip | install jetsonfanctl (automagic-fan)"
+      become: true
+      ansible.builtin.pip:
+        name: https://github.com/rnsc/jetson-fan-ctl/releases/download/v0.1.0/jetsonfanctl-0.1.0-py3-none-any.whl
+        executable: pip3
+      tags:
+        - jetsonfanctl
+
+    - name: "file | create automagic-fan etc dir"
+      become: true
+      file:
+        path: /etc/automagic-fan
+        mode: 0644
+        state: directory
+      tags:
+        - jetsonfanctl
+
+    - name: "copy | copy config for automagic-fan"
+      become: true
+      ansible.builtin.copy:
+        src: jetsonfanctl/config.json
+        dest: /etc/automagic-fan/config.json
+        mode: 0644
+      notify: restart automagic-fan
+      tags:
+        - jetsonfanctl
+
+    - name: "copy | automagic-fan systemd unit"
+      become: true
+      ansible.builtin.copy:
+        src: jetsonfanctl/automagic-fan.service
+        dest: /etc/systemd/system/automagic-fan.service
+      notify: restart automagic-fan
+      tags:
+        - jetsonfanctl
+
+    - name: "systemd | enable and start automagic-fan"
+      become: true
+      ansible.builtin.systemd:
+        name: automagic-fan
+        enabled: true
+        state: started
+      tags:
+        - jetsonfanctl

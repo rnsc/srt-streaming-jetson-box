@@ -18,23 +18,16 @@
       - python3-pip
       - python3-setuptools
     resolvconf_dir: "/etc/resolvconf/resolv.conf.d/"
-    enable_jetsonfanctl: false
     wifi_access_point: false
     intel_wifi: false
     template_belaui_config: false
+    install_jetsonfanctl: false
+    install_belaboxgpio: false
   handlers:
     - name: restart belaUI
       become: true
       ansible.builtin.systemd:
         name: belaUI
-        daemon_reload: true
-        enabled: true
-        state: restarted
-
-    - name: restart automagic-fan
-      become: true
-      ansible.builtin.systemd:
-        name: automagic-fan
         daemon_reload: true
         enabled: true
         state: restarted
@@ -193,56 +186,6 @@
         chdir: "{{ user_dir }}/{{ item.name }}"
         creates: "{{ item.creates }}"
 
-    - name: "pip | install jetsonfanctl (automagic-fan)"
-      become: true
-      ansible.builtin.pip:
-        name: https://github.com/rnsc/jetson-fan-ctl/releases/download/v0.1.0/jetsonfanctl-0.1.0-py3-none-any.whl
-        executable: pip3
-      when: enable_jetsonfanctl | bool
-      tags:
-        - jetsonfanctl
-
-    - name: "file | create automagic-fan etc dir"
-      become: true
-      file:
-        path: /etc/automagic-fan
-        mode: 0644
-        state: directory
-      when: enable_jetsonfanctl | bool
-      tags:
-        - jetsonfanctl
-
-    - name: "copy | copy config for automagic-fan"
-      become: true
-      ansible.builtin.copy:
-        src: jetsonfanctl/config.json
-        dest: /etc/automagic-fan/config.json
-        mode: 0644
-      notify: restart automagic-fan
-      when: enable_jetsonfanctl | bool
-      tags:
-        - jetsonfanctl
-
-    - name: "copy | automagic-fan systemd unit"
-      become: true
-      ansible.builtin.copy:
-        src: jetsonfanctl/automagic-fan.service
-        dest: /etc/systemd/system/automagic-fan.service
-      notify: restart automagic-fan
-      when: enable_jetsonfanctl | bool
-      tags:
-        - jetsonfanctl
-
-    - name: "systemd | enable and start automagic-fan"
-      become: true
-      ansible.builtin.systemd:
-        name: automagic-fan
-        enabled: true
-        state: started
-      when: enable_jetsonfanctl | bool
-      tags:
-        - jetsonfanctl
-
     - name: "template | template belaUI config files"
       ansible.builtin.template:
         src: "belaUI/{{ file }}.j2"
@@ -268,3 +211,17 @@
       when:
         - wifi_access_point | bool
         - intel_wifi | bool
+
+    - name: "include | jetson-fan-ctl.yml"
+      ansible.builtin.include: "jetson-fan-ctl.yml"
+      tags:
+        - jetsonfanctl
+      when:
+        - install_jetsonfanctl | bool
+
+    - name: "include | belabox-gpio.yml"
+      ansible.builtin.include: "belaboxgpio.yml"
+      tags:
+        - belaboxgpio
+      when:
+        - install_belaboxgpio | bool
