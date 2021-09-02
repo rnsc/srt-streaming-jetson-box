@@ -23,7 +23,7 @@
     - name: "pip | install belaboxgpio"
       become: true
       ansible.builtin.pip:
-        name: https://github.com/rnsc/belabox-gpio/releases/download/v0.1.0/belaboxgpio-0.1.0-py3-none-any.whl
+        name: https://github.com/rnsc/belabox-gpio/releases/download/v0.1.1/belaboxgpio-0.1.1-py3-none-any.whl
         executable: pip3
       tags:
         - belaboxgpio
