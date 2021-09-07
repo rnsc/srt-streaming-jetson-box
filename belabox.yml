@@ -139,6 +139,7 @@
       ansible.builtin.git:
         repo: https://github.com/rnsc/belaUI.git
         dest: "{{ user_dir }}/belaUI"
+        version: ws_nodejs
       failed_when: false
 
     - name: "cmd | change default home in belaUI config"
