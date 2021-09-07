@@ -9,6 +9,7 @@
       - git
       - tcl
       - nodejs
+      - npm
       - libssl-dev
       - usb-modeswitch
       - libgstreamer1.0-dev
