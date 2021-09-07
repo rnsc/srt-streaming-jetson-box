@@ -147,7 +147,7 @@
       ansible.builtin.command:
         sed -i "s#/home/nvidia#{{ user_dir }}#g" "{{ user_dir }}"/belaUI/setup.json
 
-    - name: "npm | install packages"
+    - name: "npm | install belaUI packages"
       community.general.npm:
         path: "{{ user_dir }}/belaUI/"
 
@@ -158,6 +158,7 @@
         line: "  \"autostart\": true,"
       notify: restart belaUI
       when:
+        - belaui_autostart is defined
         - belaui_autostart | bool
 
     - name: "template | belaUI service file"
