@@ -203,22 +203,22 @@
         enabled: true
         state: started
 
-- name: "include | jetson-intel-wifi.yml"
-  ansible.builtin.import_playbook: "jetson-intel-wifi.yml"
-  when:
-    - wifi_access_point | bool
-    - intel_wifi | bool
-
-- name: "include | jetson-fan-ctl.yml"
-  ansible.builtin.import_playbook: "jetson-fan-ctl.yml"
-  tags:
-    - jetsonfanctl
-  when:
-    - install_jetsonfanctl | bool
-
-- name: "include | belabox-gpio.yml"
-  ansible.builtin.import_playbook: "belaboxgpio.yml"
-  tags:
-    - belaboxgpio
-  when:
-    - install_belaboxgpio | bool
+# - name: "include | jetson-intel-wifi.yml"
+#   ansible.builtin.import_playbook: "jetson-intel-wifi.yml"
+#   when:
+#     - wifi_access_point | bool
+#     - intel_wifi | bool
+# 
+# - name: "include | jetson-fan-ctl.yml"
+#   ansible.builtin.import_playbook: "jetson-fan-ctl.yml"
+#   tags:
+#     - jetsonfanctl
+#   when:
+#     - install_jetsonfanctl | bool
+# 
+# - name: "include | belabox-gpio.yml"
+#   ansible.builtin.import_playbook: "belaboxgpio.yml"
+#   tags:
+#     - belaboxgpio
+#   when:
+#     - install_belaboxgpio | bool
