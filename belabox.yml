@@ -10,7 +10,7 @@
       - tcl
       - nodejs
       - npm
-      - libssl-dev
+      - libssl1.0-dev
       - usb-modeswitch
       - libgstreamer1.0-dev
       - libgstreamer-plugins-base1.0-dev
