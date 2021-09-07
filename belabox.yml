@@ -33,9 +33,7 @@
     - name: "assert | that needed variables are set"
       ansible.builtin.assert:
         that:
-          - srtla_addr is defined
           - resolvconf_dir is defined
-          - install_jetsonfanctl is defined
 
     - name: "set_fact | user_dir"
       ansible.builtin.set_fact:
