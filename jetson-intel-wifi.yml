@@ -4,14 +4,16 @@
   become: true
   handlers:
     - name: restart hostapd
-      systemd:
+      become: true
+      ansible.builtin.systemd:
         name: hostapd
         daemon_reload: true
         enabled: true
         masked: false
         state: restarted
     - name: restart dnsmasq
-      systemd:
+      become: true
+      ansible.builtin.systemd:
         name: dnsmasq
         daemon_reload: true
         enabled: true
