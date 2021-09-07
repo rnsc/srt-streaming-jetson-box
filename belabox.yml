@@ -9,9 +9,6 @@
       - git
       - tcl
       - libssl-dev
-      - ruby
-      - ruby-sinatra
-      - ruby-sinatra-contrib
       - usb-modeswitch
       - libgstreamer1.0-dev
       - libgstreamer-plugins-base1.0-dev
@@ -165,7 +162,7 @@
 
     - name: "cmd | configure make srt"
       become: true
-      ansible.builtin.shell:
+      ansible.builtin.shell: |
         ./configure --prefix=/usr/local
         make -j4
         sudo make install
