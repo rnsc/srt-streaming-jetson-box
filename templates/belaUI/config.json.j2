@@ -1,11 +1,14 @@
 {
+	"autostart": false,
+	"enable_auth": true,
   "srtla_addr": "{{ srtla_addr }}",
-  "delay": 0,
-  "pipeline": "7a71c94d03d83413e729d4f86d929a4e5fcb392b",
-  "pipeline_file": "{{ user_dir }}/belacoder/pipeline/jetson/h265_camlink_1080p30",
+	"autostart_delay_ms": 5000,
+  "pipeline": "cbcd3836adf1cabb4eaf1fdb0e6379193e1c3398",
+	"delay": 0,
   "min_br": 500,
   "max_br": 5000,
   "srtla_port": 5000,
   "srt_latency": 2000,
-  "srt_streamid": ""
+  "srt_streamid": "{{ streamid }}",
+	"password": "{{ belaui_password }}"
 }
