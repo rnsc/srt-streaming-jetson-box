@@ -69,17 +69,18 @@
 
     - name: "copy | copy config for belaboxgpio"
       become: true
-      ansible.builtin.fetch:
-        src: https://raw.githubusercontent.com/rnsc/belabox-gpio/v0.2.0/belaboxgpio.service
+      ansible.builtin.copy:
+        src: belaboxgpio/belaboxgpio.json
         dest: /etc/belaboxgpio/belaboxgpio.json
+        mode: 0644
       notify: restart belaboxgpio
       tags:
         - belaboxgpio
 
     - name: "copy | belaboxgpio systemd unit"
       become: true
-      ansible.builtin.copy:
-        src: belaboxgpio/belaboxgpio.service
+      ansible.builtin.fetch:
+        src: https://raw.githubusercontent.com/rnsc/belabox-gpio/v0.2.0/belaboxgpio.service
         dest: /etc/systemd/system/belaboxgpio.service
       notify: restart belaboxgpio
       tags:
