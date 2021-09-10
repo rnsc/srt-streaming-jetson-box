@@ -69,10 +69,9 @@
 
     - name: "copy | copy config for belaboxgpio"
       become: true
-      ansible.builtin.copy:
-        src: belaboxgpio/belaboxgpio.json
+      ansible.builtin.fetch:
+        src: https://raw.githubusercontent.com/rnsc/belabox-gpio/v0.2.0/belaboxgpio.service
         dest: /etc/belaboxgpio/belaboxgpio.json
-        mode: 0644
       notify: restart belaboxgpio
       tags:
         - belaboxgpio
