@@ -18,7 +18,7 @@
   tasks:
     - name: "set_fact | local user"
       ansible.builtin.set_fact:
-        local_user: "{{ ansible_user }}"
+        local_user: "{{ ansible_user_id }}"
 
     - name: "pip | install requirements"
       become: true
