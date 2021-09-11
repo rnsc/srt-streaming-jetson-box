@@ -77,10 +77,10 @@
       tags:
         - belaboxgpio
 
-    - name: "copy | belaboxgpio systemd unit"
+    - name: "get_url | belaboxgpio systemd unit"
       become: true
-      ansible.builtin.fetch:
-        src: https://raw.githubusercontent.com/rnsc/belabox-gpio/v0.2.0/belaboxgpio.service
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/rnsc/belabox-gpio/v0.2.0/belaboxgpio.service
         dest: /etc/systemd/system/belaboxgpio.service
       notify: restart belaboxgpio
       tags:
